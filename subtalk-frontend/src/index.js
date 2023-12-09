@@ -6,7 +6,7 @@ import reportWebVitals from "./reportWebVitals";
 import { HuddleProvider, HuddleClient } from "@huddle01/react";
 
 const huddleClient = new HuddleClient({
-  projectId: process.env.NEXT_PUBLIC_PROJECT_ID,
+  projectId: 'vcJkGmxQBhIf9ghmqU6W7Lj7TIexbPrX',
   options: {
     activeSpeakers: {
       size: 8,

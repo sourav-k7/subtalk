@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -10,4 +14,24 @@ body {
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+.input-field{
+	@apply form-input text-primary bg-primary-light rounded border-none focus:border-none focus:ring-0;
+}
+
+.btn-secondary{
+	@apply bg-seconday text-white rounded;
+}
+
+.outline-btn-secondary{
+	@apply rounded border-solid border-seconday border-[1px];
+}
+
+.outline-btn-primary{
+	@apply   rounded border-solid border-primary border-[1px];
+}
+
+.multiline-input-field{
+	@apply form-textarea border-none focus:border-none focus:ring-0 w-full rounded text-primary bg-primary-light;
 }
