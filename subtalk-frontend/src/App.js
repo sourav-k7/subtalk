@@ -11,6 +11,7 @@ import { usePeerIds } from "@huddle01/react/hooks";
 function App() {
   const [roomId, setRoomId] = useState("");
   const [apiKey, setAPiKey] = useState("");
+  const [jwt, setJwt] = useState({});
   const { stream, enableVideo, disableVideo, changeVideoSource } =
     useLocalVideo();
   const { enableAudio, disableAudio, changeAudioSource } = useLocalAudio();
@@ -44,42 +45,50 @@ function App() {
   useEffect(() => {
     setAPiKey(process.env.API_KEY);
     roomIDFunction();
-
-    /*const accessToken = new AccessToken({
-      apiKey: "NQhHo0SnGuHZ2laLUileHKxXAoKjKV-I",
-      roomId: id,
-      role: Role.HOST,
-      permissions: {
-        admin: true,
-        canConsume: true,
-        canProduce: true,
-        canProduceSources: {
-          cam: true,
-          mic: true,
-          screen: true,
-        },
-        canRecvData: true,
-        canSendData: true,
-        canUpdateMetadata: true,
-      },
-      options: {
-        metadata: {
-          // you can add any custom attributes here which you want to associate with the user
-          walletAddress: "axit.eth",
-        },
-      },
-    });*/
+    jwtToken();
   }, []);
 
   // useEffect(() => {
   //   console.log(roomId);
   // }, [roomId]);
-  console.log(roomId);
+
+  const accessToken = new AccessToken({
+    apiKey: "NQhHo0SnGuHZ2laLUileHKxXAoKjKV-I",
+    roomId: roomId,
+    role: Role.HOST,
+    permissions: {
+      admin: true,
+      canConsume: true,
+      canProduce: true,
+      canProduceSources: {
+        cam: true,
+        mic: true,
+        screen: true,
+      },
+      canRecvData: true,
+      canSendData: true,
+      canUpdateMetadata: true,
+    },
+    options: {
+      metadata: {
+        // you can add any custom attributes here which you want to associate with the user
+        walletAddress: "your name.eth",
+      },
+    },
+  });
+
+  const jwtToken = async () => {
+    const tempToken = await accessToken.toJwt();
+    setJwt({
+      roomId: roomId,
+      token: tempToken,
+    });
+  };
 
   return (
     <div>
-      <button onClick={() => joinRoom(roomId)}>Join Room</button>
-      <button onClick={() => leaveRoom(roomId)}>Leave Room</button>
+      <button onClick={() => joinRoom(jwt)}>Join Room</button>
+      <button onClick={() => leaveRoom(jwt)}>Leave Room</button>
       <button onClick={enableVideo}>Fetch and Produce Video Stream</button>
       <button onClick={enableAudio}>Fetch and Produce Audio Stream</button>
       <button onClick={() => fetchStream({ mediaDeviceKind: "cam" })}>
