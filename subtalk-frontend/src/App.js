@@ -42,7 +42,7 @@ function App() {
 
     setRoomId(response?.data?.data?.roomId);
 
-    const accessToken = createAccessToken(response?.data?.data?.roomId);
+    const accessToken =await createAccessToken(response?.data?.data?.roomId);
     console.log("access token :", accessToken);
     console.log("roomId:", response?.data?.data?.roomId);
     const tempToken = await accessToken.toJwt({
