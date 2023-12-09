@@ -10,10 +10,19 @@ import { JoinRoom } from "./component/JoinRoom/JoinRoom";
 import RemotePeer from "./component/RemotePeer/RemotePeer";
 import { MdOutlineCallEnd } from "react-icons/md";
 import { FaCamera, FaMicrophone } from "react-icons/fa";
+import Loader from "./component/loader";
+
+export const RoomJoinStatus = {
+  NotJoined: 'NotJoined',
+  Creating: 'Creating',
+  Joining: 'Joining',
+  Joined: 'Joined',
+}
+
 
 function App() {
   const [roomId, setRoomId] = useState("");
-  const [isRoomJoined, setIsRoomJoined] = useState(false);
+  const [isRoomJoined, setIsRoomJoined] = useState(RoomJoinStatus.NotJoined);
   const [jwt, setJwt] = useState("");
   const [isMute, setIsMute] = useState(true);
   const [isCameraOn, setIsCameraOn] = useState(false);
@@ -42,15 +51,16 @@ function App() {
 
   const { joinRoom, leaveRoom } = useRoom({
     onJoin: () => {
-      setIsRoomJoined(true);
+      setIsRoomJoined(RoomJoinStatus.Joined);
       console.log("Joined the room");
     },
     onLeave: () => {
-      setIsRoomJoined(true);
+      setIsRoomJoined(RoomJoinStatus.NotJoined);
       console.log("Left the room");
     },
   });
   const createRoom = async () => {
+    setIsRoomJoined(RoomJoinStatus.Creating);
     const response = await axios.post(
       "https://api.huddle01.com/api/v1/create-room",
       {
@@ -118,29 +128,25 @@ function App() {
 
   const handleLeaveRoom = async () => {
     leaveRoom(jwt);
-    setIsRoomJoined(false);
+    setIsRoomJoined(RoomJoinStatus.NotJoined);
   };
 
   return (
     <div className="flex flex-col ">
-      {!isRoomJoined ? (
+      {isRoomJoined !== RoomJoinStatus.Joined ? (
         <div className="flex justify-center py-16 px-8">
-          <button
+         {isRoomJoined === RoomJoinStatus.Creating? <Loader /> :<button
             className="btn-secondary py-2 px-3 mr-4"
             onClick={() => createRoom()}
           >
             Create Room
-          </button>
-
+          </button> }
+        <span className="pt-2 pr-3 text-body-light">OR</span>
           <JoinRoom
             createAccessToken={createAccessToken}
             fetchToken={fetchToken}
-            onRoomJoin={() => {
-              setIsRoomJoined(true);
-            }}
-            onRoomLeave={() => {
-              setIsRoomJoined(false);
-            }}
+            isRoomJoined={isRoomJoined}
+            setRoomJoinStatus={setIsRoomJoined}
           />
         </div>
       ) : (
