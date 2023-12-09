@@ -45,7 +45,6 @@ function App() {
   useEffect(() => {
     setAPiKey(process.env.API_KEY);
     roomIDFunction();
-    jwtToken();
   }, []);
 
   // useEffect(() => {
@@ -78,12 +77,21 @@ function App() {
   });
 
   const jwtToken = async () => {
-    const tempToken = await accessToken.toJwt();
+    console.log(roomId);
+    const tempToken = await accessToken.toJwt({
+      accessToken,
+      roomId,
+    });
+    console.log(tempToken);
     setJwt({
       roomId: roomId,
       token: tempToken,
     });
   };
+
+  useEffect(() => {
+    jwtToken();
+  }, []);
 
   return (
     <div>
