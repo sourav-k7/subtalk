@@ -54,7 +54,7 @@ const RemotePeer = ({ peerId }) => {
         ref={vidRef}
         autoPlay
         muted
-        className="border-2 rounded-xl border-white-400 aspect-video"
+        className="border-2 rounded-xl border-white-400 aspect-video bg-black"
       />
       <audio ref={audioRef} autoPlay></audio>
     </div>
