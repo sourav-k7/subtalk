@@ -20,6 +20,9 @@ function App() {
   const { peerIds } = usePeerIds({ roles: [Role.HOST, Role.CO_HOST] });
   const { stream, enableVideo, disableVideo, changeVideoSource } =
     useLocalVideo({
+      onProduceStart: () => {
+        setIsCameraOn(true);
+      },
       onProduceClose: () => {
         setIsCameraOn(false);
       },
@@ -113,10 +116,10 @@ function App() {
     await enableVideo();
   };
 
-  const handleLeaveRoom = async() =>{
-    leaveRoom(jwt)
+  const handleLeaveRoom = async () => {
+    leaveRoom(jwt);
     setIsRoomJoined(false);
-  }
+  };
 
   return (
     <div className="flex flex-col ">
