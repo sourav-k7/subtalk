@@ -3,32 +3,43 @@ import React, { useEffect, useRef } from "react";
 
 
 const RemotePeer = ({ peerId }) => {
-
+  const wsRef = useRef(null)
   // const wsUrl = `wss://api.rev.ai/speechtotext/v1/stream?access_token=02PW3mjjokhQYAtlrL0Ijz169-C0za5d_K4OTS3prgLwYJf79MnwQJi86xuTzlS6FQWRU03ShqtxEcynjTa7H4bPFdJMk&content_type=audio/x-raw;layout=interleaved;rate=16000;format=S16LE;channels=1`;
-
-  const exampleSocket = new WebSocket("wss://api.rev.ai/speechtotext/v1/stream?access_token=02PW3mjjokhQYAtlrL0Ijz169-C0za5d_K4OTS3prgLwYJf79MnwQJi86xuTzlS6FQWRU03ShqtxEcynjTa7H4bPFdJMk&content_type=audio/x-raw;layout=interleaved;rate=16000;format=S16LE;channels=1");
-
-  exampleSocket.onopen = (event) => {
-    console.log("Opened connection")
-  };
-
-  exampleSocket.onmessage = (event) => {
-    console.log("on message", event.data);
-  };
 
   const { stream: videoStream, state: videoState } = useRemoteVideo({ peerId });
   const { stream: audioStream, state: audioState, track: audioTrack } = useRemoteAudio({
     peerId, onPlayable: (data) => {
+
+      wsRef.current = new WebSocket("wss://api.rev.ai/speechtotext/v1/stream?access_token=02PW3mjjokhQYAtlrL0Ijz169-C0za5d_K4OTS3prgLwYJf79MnwQJi86xuTzlS6FQWRU03ShqtxEcynjTa7H4bPFdJMk&content_type=audio/webm;layout=interleaved;rate=16000;format=S16LE;channels=1");
+
+
       console.log("from on playable ", data)
       const mediaRecorder = new MediaRecorder(data.stream, { mimeType: 'audio/webm' });
       console.log("media Recorder playable", mediaRecorder)
       let chunks = [];
-      mediaRecorder.ondataavailable = (e) => {
-        console.log("media recorder data playable", e.data)
-        exampleSocket.send(e.data);
-        // wsUrl.send(e.data);
-        chunks.push(e.data);
+      wsRef.current.onopen = () => {
+        console.log("In socket open connection")
+        mediaRecorder.ondataavailable = async (e) => {
+          if (e.data.size > 0) {
+            const buffer = await e.data.arrayBuffer()
+            console.log("media recorder data playable", e.data)
+            console.log("buffere data ", buffer)
+            wsRef.current.send(buffer);
+            // wsUrl.send(e.data);
+            chunks.push(e.data);
+          }
+        };
       };
+
+      wsRef.current.onmessage = (event) => {
+        console.log("On message function", event.data)
+        const data = JSON.parse(event.data);
+
+        if (data.type === 'final') {
+          console.log(data.elements[0].value);
+        }
+      };
+
       // mediaRecorder.onstop = () => {
       //   const recordedBlob = new Blob(chunks, { type: 'audio/webm' });
       // Do something with the recordedBlob (e.g., save it, play it, etc.)
