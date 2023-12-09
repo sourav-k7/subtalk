@@ -51,7 +51,7 @@ function App() {
     setRoomId(response?.data?.data?.roomId);
   };
   const { stream: localAudioStream } = useLocalAudio();
-  console.log(" local audio stream", stream);
+  console.log(" local audio stream", localAudioStream);
 
   return (
     <div className="flex flex-col items-start">
