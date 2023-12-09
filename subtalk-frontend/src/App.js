@@ -7,7 +7,7 @@ import { useLocalVideo, useLocalAudio } from "@huddle01/react/hooks";
 import { useLocalMedia } from "@huddle01/react/hooks";
 import { usePeerIds } from "@huddle01/react/hooks";
 import { JoinRoom } from "./component/JoinRoom/JoinRoom";
-import { RemotePeer } from "./component/RemotePeer/RemotePeer";
+import RemotePeer from "./component/RemotePeer/RemotePeer";
 
 function App() {
   const [roomId, setRoomId] = useState("");
@@ -50,6 +50,8 @@ function App() {
     );
     setRoomId(response?.data?.data?.roomId);
   };
+  const { stream: localAudioStream } = useLocalAudio();
+  console.log(" local audio stream", stream);
 
   return (
     <div className="flex flex-col items-start">
