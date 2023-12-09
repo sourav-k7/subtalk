@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from "react";
+import { AccessToken, Role } from "@huddle01/server-sdk/auth";
 import { useRoom } from "@huddle01/react/hooks";
 
-export const JoinRoom = ({ accessToken }) => {
+export const JoinRoom = () => {
   const [roomId, setID] = useState("");
   const [jwt, setjwt] = useState("");
+  const [accessToken, setAccessToken] = useState();
   const handleRoomChange = (event) => {
     setID(event.target.value);
-    console.log(event.target.value);
   };
 
-  const fetchToken = async () => {
-    console.log(accessToken);
-    const tempToken = await accessToken?.toJwt({
-      accessToken,
+  const fetchToken = async (accToken) => {
+    const tempToken = await accToken?.toJwt({
+      accessToken: accToken,
       roomId: roomId,
     });
     setjwt({ roomId: roomId, token: tempToken });
@@ -20,8 +20,9 @@ export const JoinRoom = ({ accessToken }) => {
   };
 
   const handleJoinRoom = async () => {
-    let token = await fetchToken();
-    console.log(token);
+    let accToken = await createAccessToken(roomId);
+    setAccessToken(accToken);
+    let token = await fetchToken(accToken);
     joinRoom(token);
   };
 
@@ -33,6 +34,32 @@ export const JoinRoom = ({ accessToken }) => {
       console.log("Left the room");
     },
   });
+
+  const createAccessToken = async (roomId) => {
+    return new AccessToken({
+      apiKey: "NQhHo0SnGuHZ2laLUileHKxXAoKjKV-I",
+      roomId: roomId,
+      role: Role.HOST,
+      permissions: {
+        admin: true,
+        canConsume: true,
+        canProduce: true,
+        canProduceSources: {
+          cam: true,
+          mic: true,
+          screen: true,
+        },
+        canRecvData: true,
+        canSendData: true,
+        canUpdateMetadata: true,
+      },
+      options: {
+        metadata: {
+          walletAddress: "0x9750Cdf9c61941217825A00629B07F308472dec9",
+        },
+      },
+    });
+  };
 
   return (
     <div className="">

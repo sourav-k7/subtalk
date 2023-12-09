@@ -11,7 +11,6 @@ import { JoinRoom } from "./component/JoinRoom/JoinRoom";
 function App() {
   const [roomId, setRoomId] = useState("");
   const [apiKey, setAPiKey] = useState("");
-  const [accessToken, setAccessToken] = useState();
   const [jwt, setJwt] = useState({});
   const { stream, enableVideo, disableVideo, changeVideoSource } =
     useLocalVideo();
@@ -43,48 +42,24 @@ function App() {
 
     setRoomId(response?.data?.data?.roomId);
 
-    const accToken = await createAccessToken(response?.data?.data?.roomId);
-    setAccessToken(accToken);
-    console.log("access token :", accToken);
-    console.log("roomId:", response?.data?.data?.roomId);
-    const tempToken = await accToken.toJwt({
-      accessToken: accToken,
-      roomId: response?.data?.data?.roomId,
-    });
+    // const accToken = await createAccessToken(response?.data?.data?.roomId);
+    // setAccessToken(accToken);
+    // console.log("access token :", accToken);
+    // console.log("roomId:", response?.data?.data?.roomId);
+    // const tempToken = await accToken.toJwt({
+    //   accessToken: accToken,
+    //   roomId: response?.data?.data?.roomId,
+    // });
 
-    setJwt({
-      roomId: response?.data?.data?.roomId,
-      token: tempToken,
-    });
+    // setJwt({
+    //   roomId: response?.data?.data?.roomId,
+    //   token: tempToken,
+    // });
 
-    console.log("temptoken:", tempToken);
+    // console.log("temptoken:", tempToken);
   };
 
-  const createAccessToken = async (roomId) => {
-    return new AccessToken({
-      apiKey: "NQhHo0SnGuHZ2laLUileHKxXAoKjKV-I",
-      roomId: roomId,
-      role: Role.HOST,
-      permissions: {
-        admin: true,
-        canConsume: true,
-        canProduce: true,
-        canProduceSources: {
-          cam: true,
-          mic: true,
-          screen: true,
-        },
-        canRecvData: true,
-        canSendData: true,
-        canUpdateMetadata: true,
-      },
-      options: {
-        metadata: {
-          walletAddress: "0x9750Cdf9c61941217825A00629B07F308472dec9",
-        },
-      },
-    });
-  };
+  
 
   return (
     <div className="flex flex-col items-start">
@@ -104,7 +79,7 @@ function App() {
         Fetch Mic Stream
       </button>
 
-      <JoinRoom accessToken={accessToken} />
+      <JoinRoom />
     </div>
   );
 }
