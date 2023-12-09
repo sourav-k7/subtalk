@@ -1,29 +1,36 @@
 import { useRemoteAudio, useRemoteVideo } from "@huddle01/react/hooks";
-import React, { useEffect, useRef } from "react";
-
+import React, { useEffect, useRef, useState } from "react";
 
 const RemotePeer = ({ peerId }) => {
-  const wsRef = useRef(null)
+  const [subTitle, setSubTitle] = useState("");
+  const wsRef = useRef(null);
   // const wsUrl = `wss://api.rev.ai/speechtotext/v1/stream?access_token=02PW3mjjokhQYAtlrL0Ijz169-C0za5d_K4OTS3prgLwYJf79MnwQJi86xuTzlS6FQWRU03ShqtxEcynjTa7H4bPFdJMk&content_type=audio/x-raw;layout=interleaved;rate=16000;format=S16LE;channels=1`;
 
   const { stream: videoStream, state: videoState } = useRemoteVideo({ peerId });
-  const { stream: audioStream, state: audioState, track: audioTrack } = useRemoteAudio({
-    peerId, onPlayable: (data) => {
+  const {
+    stream: audioStream,
+    state: audioState,
+    track: audioTrack,
+  } = useRemoteAudio({
+    peerId,
+    onPlayable: (data) => {
+      wsRef.current = new WebSocket(
+        "wss://api.rev.ai/speechtotext/v1/stream?access_token=02PW3mjjokhQYAtlrL0Ijz169-C0za5d_K4OTS3prgLwYJf79MnwQJi86xuTzlS6FQWRU03ShqtxEcynjTa7H4bPFdJMk&content_type=audio/webm;layout=interleaved;rate=16000;format=S16LE;channels=1&skip_postprocessing=true&priority=speed"
+      );
 
-      wsRef.current = new WebSocket("wss://api.rev.ai/speechtotext/v1/stream?access_token=02PW3mjjokhQYAtlrL0Ijz169-C0za5d_K4OTS3prgLwYJf79MnwQJi86xuTzlS6FQWRU03ShqtxEcynjTa7H4bPFdJMk&content_type=audio/webm;layout=interleaved;rate=16000;format=S16LE;channels=1");
-
-
-      console.log("from on playable ", data)
-      const mediaRecorder = new MediaRecorder(data.stream, { mimeType: 'audio/webm' });
-      console.log("media Recorder playable", mediaRecorder)
+      console.log("from on playable ", data);
+      const mediaRecorder = new MediaRecorder(data.stream, {
+        mimeType: "audio/webm",
+      });
+      console.log("media Recorder playable", mediaRecorder);
       let chunks = [];
       wsRef.current.onopen = () => {
-        console.log("In socket open connection")
+        console.log("In socket open connection");
         mediaRecorder.ondataavailable = async (e) => {
           if (e.data.size > 0) {
-            const buffer = await e.data.arrayBuffer()
-            console.log("media recorder data playable", e.data)
-            console.log("buffere data ", buffer)
+            const buffer = await e.data.arrayBuffer();
+            console.log("media recorder data playable", e.data);
+            console.log("buffere data ", buffer);
             wsRef.current.send(buffer);
             // wsUrl.send(e.data);
             chunks.push(e.data);
@@ -32,12 +39,13 @@ const RemotePeer = ({ peerId }) => {
       };
 
       wsRef.current.onmessage = (event) => {
-        console.log("On message function", event.data)
+        console.log("On message function", event.data);
         const data = JSON.parse(event.data);
-
-        if (data.type === 'final') {
-          console.log(data.elements[0].value);
-        }
+        let subT = "";
+        data.elements?.forEach((textObj) => {
+          if (textObj.value !== "<unk>") subT += textObj.value;
+        });
+        setSubTitle(subT);
       };
 
       // mediaRecorder.onstop = () => {
@@ -49,19 +57,21 @@ const RemotePeer = ({ peerId }) => {
       mediaRecorder.start();
 
       setInterval(() => {
-        mediaRecorder.requestData();
-      }, 5000)
+        if (mediaRecorder?.state === "recording") {
+          mediaRecorder.requestData();
+        }
+      }, 3000);
 
       // setTimeout(() => {
       //   mediaRecorder.stop();
       // }, 10000); // Stop recording after 5 second
-    }
+    },
+    onClose: () => {},
   });
   const vidRef = useRef(null);
   const audioRef = useRef(null);
-  console.log('remote audio stream', audioStream);
-  console.log('remote video stream', videoStream);
-
+  console.log("remote audio stream", audioStream);
+  console.log("remote video stream", videoStream);
 
   useEffect(() => {
     if (videoStream && vidRef.current && videoState === "playable") {
@@ -83,12 +93,12 @@ const RemotePeer = ({ peerId }) => {
   }, [videoStream]);
 
   useEffect(() => {
-    console.log("audio stream", audioStream)
-    console.log("audio track ", audioTrack)
+    console.log("audio stream", audioStream);
+    console.log("audio track ", audioTrack);
 
     if (audioStream && audioRef.current && audioState === "playable") {
       audioRef.current.srcObject = audioStream;
-      console.log("audio peer stream ", audioStream)
+      console.log("audio peer stream ", audioStream);
 
       // const mediaRecorder = new MediaRecorder(audioStream, { mimeType: 'audio/webm' });
       // console.log("media Recorder", mediaRecorder)
@@ -100,7 +110,7 @@ const RemotePeer = ({ peerId }) => {
 
       audioRef.current.onloadedmetadata = async () => {
         try {
-          console.log("in audioRef", audioRef.current)
+          console.log("in audioRef", audioRef.current);
           audioRef.current?.play();
         } catch (error) {
           console.error(error);
@@ -114,7 +124,7 @@ const RemotePeer = ({ peerId }) => {
   }, [audioStream]);
 
   return (
-    <div>
+    <div className="text-center">
       <video
         ref={vidRef}
         autoPlay
@@ -122,6 +132,7 @@ const RemotePeer = ({ peerId }) => {
         className="border-2 rounded-xl border-white-400 aspect-video bg-black"
       />
       <audio ref={audioRef} autoPlay></audio>
+      {subTitle}
     </div>
   );
 };

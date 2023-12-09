@@ -156,7 +156,7 @@ function App() {
               return <RemotePeer peerId={peerId} />;
             })}
           </div>
-          <div>Room id: {roomId}</div>
+          {roomId && <div>Room id: {roomId}</div>}
           <div>
             <button
               onClick={handleLeaveRoom}
