@@ -11,6 +11,7 @@ import { usePeerIds } from "@huddle01/react/hooks";
 function App() {
   const [roomId, setRoomId] = useState("");
   const [apiKey, setAPiKey] = useState("");
+  // const [accessToken, setAccessToken] = useState();
   const [jwt, setJwt] = useState({});
   const { stream, enableVideo, disableVideo, changeVideoSource } =
     useLocalVideo();
@@ -41,6 +42,42 @@ function App() {
     );
 
     setRoomId(response?.data?.data?.roomId);
+
+    const accessToken = new AccessToken({
+      apiKey: "NQhHo0SnGuHZ2laLUileHKxXAoKjKV-I",
+      roomId: response?.data?.data?.roomId,
+      role: Role.HOST,
+      permissions: {
+        admin: true,
+        canConsume: true,
+        canProduce: true,
+        canProduceSources: {
+          cam: true,
+          mic: true,
+          screen: true,
+        },
+        canRecvData: true,
+        canSendData: true,
+        canUpdateMetadata: true,
+      },
+      options: {
+        metadata: {
+          // you can add any custom attributes here which you want to associate with the user
+          walletAddress: "0x9750Cdf9c61941217825A00629B07F308472dec9",
+        },
+      },
+    });
+
+    // setAccessToken(token);
+    console.log(response?.data?.data?.roomId);
+    const tempToken = await accessToken.toJwt({
+      accessToken,
+      roomId: response?.data?.data?.roomId,
+    });
+
+    setJwt({ roomId: response?.data?.data?.roomId, token: tempToken });
+
+    console.log(tempToken);
   };
   useEffect(() => {
     setAPiKey(process.env.API_KEY);
@@ -50,48 +87,6 @@ function App() {
   // useEffect(() => {
   //   console.log(roomId);
   // }, [roomId]);
-
-  const accessToken = new AccessToken({
-    apiKey: "NQhHo0SnGuHZ2laLUileHKxXAoKjKV-I",
-    roomId: roomId,
-    role: Role.HOST,
-    permissions: {
-      admin: true,
-      canConsume: true,
-      canProduce: true,
-      canProduceSources: {
-        cam: true,
-        mic: true,
-        screen: true,
-      },
-      canRecvData: true,
-      canSendData: true,
-      canUpdateMetadata: true,
-    },
-    options: {
-      metadata: {
-        // you can add any custom attributes here which you want to associate with the user
-        walletAddress: "your name.eth",
-      },
-    },
-  });
-
-  const jwtToken = async () => {
-    console.log(roomId);
-    const tempToken = await accessToken.toJwt({
-      accessToken,
-      roomId,
-    });
-    console.log(tempToken);
-    setJwt({
-      roomId: roomId,
-      token: tempToken,
-    });
-  };
-
-  useEffect(() => {
-    jwtToken();
-  }, []);
 
   return (
     <div>
