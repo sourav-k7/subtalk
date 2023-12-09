@@ -1,7 +1,0 @@
-{
-  "dependencies": {
-    "@huddle01/react": "^1.0.0-alpha.57",
-    "@huddle01/server-sdk": "^1.0.0-alpha.25",
-    "axios": "^1.6.2"
-  }
-}
