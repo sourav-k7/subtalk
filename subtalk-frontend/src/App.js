@@ -61,8 +61,7 @@ function App() {
   const createAccessToken = async (roomId) => {
     return new AccessToken({
       apiKey: "NQhHo0SnGuHZ2laLUileHKxXAoKjKV-I",
-      // roomId: response?.data?.data?.roomId,
-      roomId: "fbu-feeg-lxf",
+      roomId: roomId,
       role: Role.HOST,
       permissions: {
         admin: true,
@@ -79,7 +78,6 @@ function App() {
       },
       options: {
         metadata: {
-          // you can add any custom attributes here which you want to associate with the user
           walletAddress: "0x9750Cdf9c61941217825A00629B07F308472dec9",
         },
       },
