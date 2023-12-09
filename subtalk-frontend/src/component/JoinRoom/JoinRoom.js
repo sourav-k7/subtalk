@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, {  useState } from "react";
 import { AccessToken, Role } from "@huddle01/server-sdk/auth";
 import { useRoom } from "@huddle01/react/hooks";
 

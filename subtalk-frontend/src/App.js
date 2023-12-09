@@ -1,5 +1,4 @@
 import "./App.css";
-import { AccessToken, Role } from "@huddle01/server-sdk/auth";
 import axios from "axios";
 import { useState } from "react";
 import { useRoom } from "@huddle01/react/hooks";
@@ -14,7 +13,13 @@ function App() {
   const [jwt, setJwt] = useState({});
   const { stream, enableVideo, disableVideo, changeVideoSource } =
     useLocalVideo();
-  const { enableAudio, disableAudio, changeAudioSource } = useLocalAudio();
+  const { enableAudio, disableAudio, changeAudioSource } = useLocalAudio(
+    { onProduceStart: (producer) => {
+      console.log("Started producing your audio stream!");
+      console.log(producer);
+        // your code here
+    }}
+  );
   const { fetchStream } = useLocalMedia();
 
   const { joinRoom, leaveRoom } = useRoom({
@@ -39,24 +44,7 @@ function App() {
         },
       }
     );
-
     setRoomId(response?.data?.data?.roomId);
-
-    // const accToken = await createAccessToken(response?.data?.data?.roomId);
-    // setAccessToken(accToken);
-    // console.log("access token :", accToken);
-    // console.log("roomId:", response?.data?.data?.roomId);
-    // const tempToken = await accToken.toJwt({
-    //   accessToken: accToken,
-    //   roomId: response?.data?.data?.roomId,
-    // });
-
-    // setJwt({
-    //   roomId: response?.data?.data?.roomId,
-    //   token: tempToken,
-    // });
-
-    // console.log("temptoken:", tempToken);
   };
 
   
@@ -68,8 +56,8 @@ function App() {
       </button>
       <div>{roomId}</div>
       <button onClick={() => leaveRoom(jwt)}>Leave Room</button>
-      <button onClick={enableVideo}>Fetch and Produce Video Stream</button>
-      <button onClick={enableAudio}>Fetch and Produce Audio Stream</button>
+      <button onClick={async()=> await enableVideo()}>Fetch and Produce Video Stream</button>
+      <button onClick={async()=> await enableAudio()}>Fetch and Produce Audio Stream</button>
       <button onClick={() => fetchStream({ mediaDeviceKind: "cam" })}>
         Fetch Cam Stream
       </button>
