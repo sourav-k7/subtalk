@@ -1,6 +1,6 @@
 import "./App.css";
 import axios from "axios";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AccessToken, Role } from "@huddle01/server-sdk/auth";
 import { useRoom } from "@huddle01/react/hooks";
 import { useLocalVideo, useLocalAudio } from "@huddle01/react/hooks";
@@ -11,6 +11,7 @@ import RemotePeer from "./component/RemotePeer/RemotePeer";
 import { MdOutlineCallEnd } from "react-icons/md";
 import { FaCamera, FaMicrophone } from "react-icons/fa";
 import Loader from "./component/loader";
+import translate from "translate";
 
 export const RoomJoinStatus = {
   NotJoined: 'NotJoined',
@@ -131,17 +132,29 @@ function App() {
     setIsRoomJoined(RoomJoinStatus.NotJoined);
   };
 
+  translate.engine = "deepl";
+  translate.key = process.env.DEEPL_KEY;
+
+  const translateText = async () => {
+    const text = await axios.get("https://api.mymemory.translated.net/set?seg=Hello!&tra=Ciao Mondo!&langpair=en|it");
+    console.log(text.data)
+  }
+
+  useEffect(() => {
+    translateText()
+  }, [])
+
   return (
     <div className="flex flex-col ">
       {isRoomJoined !== RoomJoinStatus.Joined ? (
         <div className="flex justify-center py-16 px-8">
-         {isRoomJoined === RoomJoinStatus.Creating? <Loader /> :<button
+          {isRoomJoined === RoomJoinStatus.Creating ? <Loader /> : <button
             className="btn-secondary py-2 px-3 mr-4"
             onClick={() => createRoom()}
           >
             Create Room
-          </button> }
-        <span className="pt-2 pr-3 text-body-light">OR</span>
+          </button>}
+          <span className="pt-2 pr-3 text-body-light">OR</span>
           <JoinRoom
             createAccessToken={createAccessToken}
             fetchToken={fetchToken}
@@ -168,17 +181,15 @@ function App() {
               onClick={() =>
                 isCameraOn ? disableVideo() : handleEnableVideo()
               }
-              className={`h-10 w-10 ${
-                !isCameraOn ? "bg-red-500" : "bg-[#dadce0]"
-              } text-white rounded  mr-5`}
+              className={`h-10 w-10 ${!isCameraOn ? "bg-red-500" : "bg-[#dadce0]"
+                } text-white rounded  mr-5`}
             >
               <FaCamera size={25} className={"m-auto"} />
             </button>
             <button
               onClick={() => (!isMute ? disableAudio() : handleEnableAudio())}
-              className={`h-10 w-10 ${
-                isMute ? "bg-red-500" : "bg-[#dadce0]"
-              } text-white rounded  mr-5`}
+              className={`h-10 w-10 ${isMute ? "bg-red-500" : "bg-[#dadce0]"
+                } text-white rounded  mr-5`}
             >
               <FaMicrophone size={25} className={"m-auto"} />
             </button>

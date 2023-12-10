@@ -4,6 +4,7 @@ import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { HuddleProvider, HuddleClient } from "@huddle01/react";
+import { LightNodeProvider } from "@waku/react";
 
 const huddleClient = new HuddleClient({
   projectId: 'vcJkGmxQBhIf9ghmqU6W7Lj7TIexbPrX',
@@ -14,11 +15,15 @@ const huddleClient = new HuddleClient({
   },
 });
 
+const NODE_OPTIONS = { defaultBootstrap: true };
+
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-  <HuddleProvider client={huddleClient}>
-    <App />
-  </HuddleProvider>
+  <LightNodeProvider options={NODE_OPTIONS}>
+    <HuddleProvider client={huddleClient}>
+      <App />
+    </HuddleProvider>
+  </LightNodeProvider>
 );
 
 // If you want to start measuring performance in your app, pass a function
