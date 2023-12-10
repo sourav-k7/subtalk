@@ -145,7 +145,8 @@ function App() {
   }, [])
 
   return (
-    <div className="flex flex-col ">
+    <div className="flex flex-col text-center">
+      <h1 className="text-4xl font-bold">Subtalk</h1>
       {isRoomJoined !== RoomJoinStatus.Joined ? (
         <div className="flex justify-center py-16 px-8">
           {isRoomJoined === RoomJoinStatus.Creating ? <Loader /> : <button
@@ -164,12 +165,12 @@ function App() {
         </div>
       ) : (
         <div className="flex flex-col items-center">
-          <div>
+          <div className="mt-2">
             {peerIds.map((peerId) => {
               return <RemotePeer peerId={peerId} />;
             })}
           </div>
-          {roomId && <div>Room id: {roomId}</div>}
+          {roomId && <div className="mt-2">Room id: {roomId}</div>}
           <div>
             <button
               onClick={handleLeaveRoom}

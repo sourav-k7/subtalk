@@ -1,5 +1,6 @@
 import { useRemoteAudio, useRemoteVideo } from "@huddle01/react/hooks";
 import React, { useEffect, useRef, useState } from "react";
+import translate from "translate";
 
 const RemotePeer = ({ peerId }) => {
   const [subTitle, setSubTitle] = useState("");
@@ -45,7 +46,12 @@ const RemotePeer = ({ peerId }) => {
         data.elements?.forEach((textObj) => {
           if (textObj.value !== "<unk>") subT += textObj.value;
         });
-        setSubTitle(subT);
+        console.log('subT',subT);
+        subT = subT.trim();
+        if (subT !== "" && data.type==="final") {
+          textTranslate(subT);
+        }
+        // setSubTitle(subT);
       };
 
       // mediaRecorder.onstop = () => {
@@ -73,6 +79,13 @@ const RemotePeer = ({ peerId }) => {
   console.log("remote audio stream", audioStream);
   console.log("remote video stream", videoStream);
 
+  const textTranslate  =async (subT)=>{
+    translate.engine = "google";
+    translate.key = process.env.DEEPL_KEY;
+    const text = await translate(subT, "hi");
+    setSubTitle(text);
+  }
+
   useEffect(() => {
     if (videoStream && vidRef.current && videoState === "playable") {
       vidRef.current.srcObject = videoStream;
@@ -91,6 +104,14 @@ const RemotePeer = ({ peerId }) => {
       };
     }
   }, [videoStream]);
+
+  useEffect(() => {
+    const msg = new SpeechSynthesisUtterance()
+    msg.lang='hi-IN';
+    msg.text = subTitle
+    window.speechSynthesis.speak(msg)
+  }, [subTitle])
+
 
   useEffect(() => {
     console.log("audio stream", audioStream);
