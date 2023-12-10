@@ -1,12 +1,10 @@
-import * as PushAPI from "@pushprotocol/restapi";
-import * as ethers from "ethers";
-import dotenv from 'dotenv';
-dotenv.config(); 
+const { PushAPI }  = require("@pushprotocol/restapi");
+const hre = require("hardhat");
 
-const PK = process.env.PK;
-console.log(PK);
-const Pkey = `0x${process.env.PK}`;
-const signer = new ethers.Wallet(Pkey);
+// const PK = process.env.PK;
+// console.log(PK);
+const Pkey = `0x0xb2ba1656a94c3212aa6ef384b19165224400289a920278568e6f51d6831db38d`;
+const signer = new hre.ethers.Wallet(Pkey);
 
 const sendNotification = async() => {
   try {
@@ -25,7 +23,7 @@ const sendNotification = async() => {
         img: ''
       },
       recipients: '',//['eip155:5:0x6BE7Cc13326907f3AF2D3C173B58f60a6d0A231e', 'eip155:5:0x2278D5cC7f7c7241049Ff9B300A3A89Ca14E0376'], // recipient address
-      channel: 'eip155:5:0xFaadD7A7091bd909D90893317a9A94ae7B32fA18', // your channel address
+      channel: 'eip155:5:0x9750Cdf9c61941217825A00629B07F308472dec9', // your channel address
       env: 'staging'
     });
     
